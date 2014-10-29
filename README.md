@@ -9,7 +9,7 @@ Requirements :
 This module (in fact: perfsonar) requires that your host is correctly setup.
 Especially, it will not attempt to :
 - change your NTP settings
-- change oyur network settings
+- change your network settings
 - change any kernel setting
 
 How to use :
@@ -54,17 +54,19 @@ Puppet Dependencies
 
 This module depends on :
 
-dependency 'saz/sudo', '>= 2.0.8'
-dependency 'puppetlabs/firewall', ''
-dependency 'puppetlabs/stdlib', ''
+- dependency 'saz/sudo', '>= 2.0.8'
+- dependency 'puppetlabs/firewall', ''
+- dependency 'puppetlabs/stdlib', ''
 
 Supported OSes
 ==============
 Officially, none ;)
+
 Unofficially, this seems to be working well on SL 6.5 x86_64 hosts kickstarted with foreman. No need for any specific kickstart template.
 
 Notes
 =====
 
 IPv6 is untested at the moment, but ipv6 firewall seems to be in place.
+
 Beware that the default policy usually is "ACCEPT", we don't change that neither for IPv4 nor IPv6.
