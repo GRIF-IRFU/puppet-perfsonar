@@ -1,0 +1,14 @@
+full_name=<%= scope.lookupvar('perfsonar::admin_name') %>
+site_name=<%= scope.lookupvar('perfsonar::site_name') %>
+site_location=<%= scope.lookupvar('perfsonar::site_location') %>
+<% site_projects = scope.lookupvar('perfsonar::site_projects') || [] -%>
+<% site_projects.each do |site_project| -%>
+site_project=<%= site_project %>
+<% end -%>
+administrator_email=<%= scope.lookupvar('perfsonar::administrator_email') %>
+city=<%= scope.lookupvar('perfsonar::city') %>
+state=<%= scope.lookupvar('perfsonar::state') %>
+country=<%= scope.lookupvar('perfsonar::country') %>
+zipcode=<%= scope.lookupvar('perfsonar::zipcode') %>
+latitude=<%= scope.lookupvar('perfsonar::latitude') %>
+longitude=<%= scope.lookupvar('perfsonar::longitude') %>

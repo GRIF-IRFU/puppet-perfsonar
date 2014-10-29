@@ -1,40 +1,43 @@
 /*
  * The non mirrored internet2 repos. *This is RHEL ONLY !*
  */
-class perfsonar::repos($enable_web100=false) {
-  
+class perfsonar::repos( $enable_web100 = false ) {
+
   #first, put the gpg repo file in place.
-  $gpgpath='/etc/pki/rpm-gpg' #where to store the gpg file
-  $gpgfile='RPM-GPG-KEY-Internet2'
-  
+
+  #where to store the gpg file
+  $gpgpath = '/etc/pki/rpm-gpg'
+  $gpgfile = 'RPM-GPG-KEY-Internet2'
+
   file { $gpgfile:
-    source=>"puppet:///modules/perfsonar/${gpgfile}",
-    path=>"${gpgpath}/${gpgfile}",
     ensure => present,
+    source => "puppet:///modules/perfsonar/${gpgfile}",
+    path   => "${gpgpath}/${gpgfile}",
     #notify => Exec['OS gpgfiles import'],
   }
-  
-  ->
-  
-  yumrepo { "Internet2":
-    baseurl => "http://software.internet2.edu/rpms/el${::operatingsystemmajrelease}/\$basearch/main",
-    gpgkey => "file://${gpgpath}/${gpgfile}",
-    descr => "Internet2 RPM Repository - software.internet2.edu",
-    enabled => 1,
+
+  yumrepo { 'Internet2':
+    baseurl  => "http://software.internet2.edu/rpms/el${::operatingsystemmajrelease}/\$basearch/main",
+    gpgkey   => "file://${gpgpath}/${gpgfile}",
+    descr    => 'Internet2 RPM Repository - software.internet2.edu - main',
+    enabled  => 1,
     gpgcheck => 1,
+    require  => File[$gpgfile],
+  }->
+  #this is here in case the yum repos.d dir is purged by your manifests
+  file { '/etc/yum.repos.d/Internet2.repo':
+    ensure => present,
   }
-  ->
-  file {'/etc/yum.repos.d/Internet2.repo': ensure => present} #this is here in case the yum repos.d dir is purged by your manifests
-  
-  if($enable_web100) { 
-    
-    yumrepo { "Internet2-web100":
-      baseurl => "http://software.internet2.edu/web100_kernel/rpms/el${::operatingsystemmajrelease}/\$basearch/main",
-      gpgkey => "file://${gpgpath}/${gpgfile}",
-      descr => "Internet2 web100 Kernel RPM Repository - software.internet2.edu",
-      enabled => 1,
+
+  if($enable_web100) {
+    yumrepo { 'Internet2-web100':
+      baseurl  => "http://software.internet2.edu/web100_kernel/rpms/el${::operatingsystemmajrelease}/\$basearch/main",
+      gpgkey   => "file://${gpgpath}/${gpgfile}",
+      descr    => 'Internet2 web100 Kernel RPM Repository - software.internet2.edu - main',
+      enabled  => 1,
       gpgcheck => 1,
-      }
+      require  => File[$gpgfile],
+    }
   }
-  
+
 }
