@@ -168,12 +168,12 @@ class perfsonar(
       ensure     =>running,
       hasstatus  =>false,
       hasrestart =>true,
-      require    =>Package[perl-perfSONAR_PS-LSRegistrationDaemon];
+      require    =>Package[perl-perfSONAR_PS-LSCacheDaemon];
     'ls_registration_daemon':
       ensure     =>running,
       hasstatus  =>false,
       hasrestart =>true,
-      require    =>Package[perl-perfSONAR_PS-LSCacheDaemon];
+      require    =>Package[perl-perfSONAR_PS-LSRegistrationDaemon];
     'cassandra':
       ensure     =>running,
       hasstatus  =>true,

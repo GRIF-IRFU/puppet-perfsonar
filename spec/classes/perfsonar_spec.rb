@@ -152,7 +152,7 @@ describe 'perfsonar' do
       :ensure     => 'running',
       :hasstatus  => 'false',
       :hasrestart => 'true',
-      :require    => 'Package[perl-perfSONAR_PS-LSRegistrationDaemon]',
+      :require    => 'Package[perl-perfSONAR_PS-LSCacheDaemon]',
       :before     => 'Service[httpd]',
     })
   end
@@ -162,7 +162,7 @@ describe 'perfsonar' do
       :ensure     => 'running',
       :hasstatus  => 'false',
       :hasrestart => 'true',
-      :require    => 'Package[perl-perfSONAR_PS-LSCacheDaemon]',
+      :require    => 'Package[perl-perfSONAR_PS-LSRegistrationDaemon]',
       :before     => 'Service[httpd]',
     })
   end

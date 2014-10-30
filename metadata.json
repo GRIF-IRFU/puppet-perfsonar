@@ -1,0 +1,24 @@
+{
+  "name": "puppet-perfsonar",
+  "version": "0.1.0",
+  "summary": "",
+  "author": "Frederic Schaer",
+  "description": "",
+  "dependencies": [
+    {
+      "name": "saz/sudo",
+      "version_requirement": "\u003e\u003d 2.0.8"
+    },
+    {
+      "name": "puppetlabs/firewall"
+    },
+    {
+      "name": "puppetlabs/stdlib"
+    }
+  ],
+  "types": [],
+  "checksums": {},
+  "source": "",
+  "project_page": "",
+  "license": "CeCILL-C"
+}
