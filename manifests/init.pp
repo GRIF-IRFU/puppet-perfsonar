@@ -159,7 +159,10 @@ class perfsonar(
     ensure  => present,
     require => Package[perl-perfSONAR_PS-Toolkit],
   }
-
+  group { $web_login:
+    ensure  => present,
+  }
+  
   #
   # Some services
   #
@@ -228,6 +231,6 @@ class perfsonar(
 
   exec { '/opt/perfsonar_ps/toolkit/scripts/update_administrative_info.pl':
     refreshonly => true,
-    require     => Package[perl-perfSONAR_PS-Toolkit]
+    require     => Service[config_daemon],
   }
 }
