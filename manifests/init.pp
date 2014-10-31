@@ -58,12 +58,12 @@ class perfsonar(
       $pkglist = [  web100_userland,owamp-client,owamp-server,bwctl-client,bwctl-server,ndt,npad,nuttcp,perl-perfSONAR_PS-LSRegistrationDaemon,perl-perfSONAR_PS-LSCacheDaemon,perl-perfSONAR_PS-LookupService,perl-perfSONAR_PS-SNMPMA,perl-perfSONAR_PS-PingER-server,perl-perfSONAR_PS-perfSONARBUOY-client,perl-perfSONAR_PS-perfSONARBUOY-server,perl-perfSONAR_PS-perfSONARBUOY-config,perl-perfSONAR_PS-TracerouteMA-config,perl-perfSONAR_PS-TracerouteMA-client,perl-perfSONAR_PS-TracerouteMA-server,perl-perfSONAR_PS-Toolkit,perl-perfSONAR_PS-Toolkit-SystemEnvironment,kmod-sk98lin]
     }
     /^3.3/ :{
-      $iperf   = 'iperf3'
+      $iperf   = [ iperf3,iperf3-devel ]
       $pkglist = [ web100_userland,owamp-client,owamp-server,bwctl-client,bwctl-server,ndt,npad,nuttcp,perl-perfSONAR_PS-Toolkit,perl-perfSONAR_PS-Toolkit-SystemEnvironment,perl-perfSONAR_PS-LSCacheDaemon,perl-perfSONAR_PS-LSRegistrationDaemon,perl-perfSONAR_PS-MeshConfig-Agent,perl-perfSONAR_PS-PingER-server,perl-perfSONAR_PS-SimpleLS-BootStrap-client,perl-perfSONAR_PS-SNMPMA,perl-perfSONAR_PS-TracerouteMA-client,perl-perfSONAR_PS-TracerouteMA-config,perl-perfSONAR_PS-TracerouteMA-server,perl-perfSONAR_PS-perfSONARBUOY-client,perl-perfSONAR_PS-perfSONARBUOY-config,perl-perfSONAR_PS-perfSONARBUOY-server,kmod-sk98lin,tcptrace,xplot-tcptrace,tcpdump,]
     }
     #3.4+
     default :{
-      $iperf   = 'iperf3'
+      $iperf   = [ iperf3,iperf3-devel ]
       $pkglist = [ web100_userland,owamp-client,owamp-server,bwctl-client,bwctl-server,ndt,npad,nuttcp,perl-perfSONAR_PS-Toolkit,perl-perfSONAR_PS-Toolkit-SystemEnvironment,perl-perfSONAR_PS-LSCacheDaemon,perl-perfSONAR_PS-LSRegistrationDaemon,perl-perfSONAR_PS-MeshConfig-Agent,perl-perfSONAR_PS-PingER-server,perl-perfSONAR_PS-SimpleLS-BootStrap-client,perl-perfSONAR_PS-SNMPMA,perl-perfSONAR_PS-TracerouteMA-client,perl-perfSONAR_PS-TracerouteMA-config,perl-perfSONAR_PS-TracerouteMA-server,perl-perfSONAR_PS-perfSONARBUOY-client,perl-perfSONAR_PS-perfSONARBUOY-config,perl-perfSONAR_PS-perfSONARBUOY-server,tcptrace,xplot-tcptrace,tcpdump,perl-Try-Tiny]
     }
   }
@@ -109,7 +109,8 @@ class perfsonar(
   #See, for each service :
   #http://psps.perfsonar.net/services.html
   package {
-    [libgomp,httpd,php,php-gd,php-xml,php-snmp,mysql,mysql-devel,perl-DBI,perl-DBD-MySQL,$iperf]: ensure => present
+    [libgomp,httpd,php,php-gd,php-xml,php-snmp,mysql,mysql-devel,perl-DBI,perl-DBD-MySQL]: ensure => present;
+    $iperf: ensure => latest
   }
   ->
   package { $pkglist:
