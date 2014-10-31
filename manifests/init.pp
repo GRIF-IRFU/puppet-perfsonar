@@ -78,7 +78,6 @@ class perfsonar(
       path        => ['/usr/bin','/usr/sbin','/bin','/sbin',],
       command     => "yum upgrade \"kernel-2.6*web100.i686\"",
       refreshonly => true,
-      subscribe   => Exec[os_updates_os],#only run web100 upgrade after OS upgrade, so that kernel remains default grub kernel (if both are updated)
     }
 
     #kernel grub config - NEEDS REWORKING (yum list output not on a single line, running kernel is a PAE one...)
