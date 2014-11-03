@@ -108,10 +108,6 @@ describe 'perfsonar' do
     })
   end
 
-  it "should manage sudo for wheel" do
-    should contain_sudo__conf('wheel').with_content('%wheel        ALL=(ALL)       ALL')
-  end
-
   it "should manage ipv4 firewall" do
     should contain_class('perfsonar::firewall::ipv4')
   end

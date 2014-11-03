@@ -3,6 +3,5 @@ version '0.1.0'
 
 author 'Frederic Schaer'
 license 'CeCILL-C'
-dependency 'saz/sudo', '>= 2.0.8'
 dependency 'puppetlabs/firewall', ''
 dependency 'puppetlabs/stdlib', ''

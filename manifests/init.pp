@@ -124,13 +124,6 @@ class perfsonar(
     hasstatus  => true,
   }
 
-
-  #configure sudo for perfsonar :
-  #is it still necessary ?
-  sudo::conf { 'wheel':
-    content => "%wheel        ALL=(ALL)       ALL",
-  }
-
   #firewall
   if $manage_ipv4_firewall { include perfsonar::firewall::ipv4 }
   if $manage_ipv6_firewall { include perfsonar::firewall::ipv6 }

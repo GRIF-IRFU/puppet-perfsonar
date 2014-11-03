@@ -6,10 +6,6 @@
   "description": "",
   "dependencies": [
     {
-      "name": "saz/sudo",
-      "version_requirement": "\u003e\u003d 2.0.8"
-    },
-    {
       "name": "puppetlabs/firewall"
     },
     {

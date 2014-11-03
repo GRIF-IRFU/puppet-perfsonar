@@ -54,7 +54,6 @@ Puppet Dependencies
 
 This module depends on :
 
-- dependency 'saz/sudo', '>= 2.0.8'
 - dependency 'puppetlabs/firewall', ''
 - dependency 'puppetlabs/stdlib', ''
 
