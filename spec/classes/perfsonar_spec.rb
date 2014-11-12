@@ -19,7 +19,10 @@ def packages
       'perl-DBD-MySQL',
     ],
     '3.4' => {
-      'iperf'   =>  'iperf3',
+      'iperf'   =>  [
+        'iperf3',
+        'iperf3-devel',
+      ],
       'pkglist' => [
         'web100_userland',
         'owamp-client',
@@ -93,7 +96,9 @@ describe 'perfsonar' do
     it { should contain_package(p).with_ensure('present') }
   end
 
-  it { should contain_package(packages['3.4']['iperf']).with_ensure('present') }
+  packages['3.4']['iperf'].each do |p|
+    it { should contain_package(p).with_ensure('latest') }
+  end
 
   packages['3.4']['pkglist'].each do |p|
     it { should contain_package(p).with_ensure('present').that_notifies('Service[httpd]') }
@@ -126,7 +131,7 @@ describe 'perfsonar' do
     })
   end
 
-  it "should manage web login User" do
+  it "should manage web_login User" do
     should contain_user('admin').with({
       :ensure   => 'present',
       :shell    => '/bin/false',
@@ -140,6 +145,12 @@ describe 'perfsonar' do
     should contain_group('psadmin').with({
       :ensure => 'present',
       :require  => 'Package[perl-perfSONAR_PS-Toolkit]',
+    })
+  end
+
+  it "should manage web_login Group" do
+    should contain_group('admin').with({
+      :ensure => 'present',
     })
   end
 
@@ -213,7 +224,7 @@ describe 'perfsonar' do
   it "should have Exec for update_administrative_info.pl" do
     should contain_exec('/opt/perfsonar_ps/toolkit/scripts/update_administrative_info.pl').with({
       :refreshonly  => 'true',
-      :require      => 'Package[perl-perfSONAR_PS-Toolkit]',
+      :require      => 'Service[config_daemon]',
     })
   end
 
