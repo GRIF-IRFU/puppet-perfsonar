@@ -1,8 +1,10 @@
-class perfsonar::firewall::ipv4 inherits perfsonar::params {
+class perfsonar::firewall::ipv4(
+  $ipt_allow_order=$perfsonar::params::firewall_order
+) inherits perfsonar::params {
   #
   # ICMP
   #
-  firewall {'200 IN allow perfsonar PS specific ICMP':
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific ICMP":
       proto  => 'icmp',
       icmp   => $perfsonar::params::icmp_types,
       chain  => 'INPUT',
@@ -12,13 +14,13 @@ class perfsonar::firewall::ipv4 inherits perfsonar::params {
   #
   # TCP ports
   #
-  firewall {'200 IN allow perfsonar PS specific TCP ports (1)(stateless)':
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific TCP ports (1)(stateless)":
       proto  => 'tcp',
       port   => $perfsonar::params::owamp_tcp_ports,
       chain  => 'INPUT',
       action => 'accept',
   }
-  firewall {'200 IN allow perfsonar PS specific TCP ports (2)(stateless)':
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific TCP ports (2)(stateless)":
       proto  => 'tcp',
       port   => $perfsonar::params::bwctl_tcp_ports,
       chain  => 'INPUT',
@@ -30,19 +32,19 @@ class perfsonar::firewall::ipv4 inherits perfsonar::params {
   #
   # UDP ports
   #
-  firewall {'200 IN allow perfsonar PS specific UDP ports (1)(stateless)':
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP ports (1)(stateless)":
       proto  => 'udp',
       port   => $perfsonar::params::owamp_udp_ports,
       chain  => 'INPUT',
       action => 'accept',
   }
-  firewall {'200 IN allow perfsonar PS specific UDP ports (2)(stateless)':
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP ports (2)(stateless)":
       proto  => 'udp',
       port   => $perfsonar::params::bwctl_udp_ports,
       chain  => 'INPUT',
       action => 'accept',
   }
-  firewall {'200 IN allow perfsonar PS specific UDP ports (3)(stateless)':
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP ports (3)(stateless)":
       proto  => 'udp',
       port   => $perfsonar::params::traceroute_ports,
       chain  => 'INPUT',

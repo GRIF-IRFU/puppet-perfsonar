@@ -132,7 +132,7 @@ class perfsonar(
   #ps-PS 3.3+case
   file { "/opt/perfsonar_ps/mesh_config/etc/agent_configuration.conf" :
     ensure  => present,
-    mode    => 0750,
+    mode    => '0644',
     content => template("perfsonar/mesh_conf.3.3.erb"),
     owner   => perfsonar,group=>perfsonar,
     require => Package[perl-perfSONAR_PS-MeshConfig-Agent],
