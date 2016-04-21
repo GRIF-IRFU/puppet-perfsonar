@@ -1,59 +1,62 @@
 class perfsonar::firewall::ipv6 (
-  $ipt_allow_order=$perfsonar::params::firewall_order
-) inherits perfsonar::params {
-  
+  $ipt_allow_order=$perfsonar::firewall_order
+) {
+
   #
   # ICMP
   #
   firewall {"${ipt_allow_order} IN allow perfsonar PS specific ICMP v6":
       provider => 'ip6tables',
       proto    => 'ipv6-icmp',
-      icmp     => $perfsonar::params::icmp_types,
+      icmp     => $perfsonar::icmp_types,
       chain    => 'INPUT',
       action   => 'accept',
   }
-  
+
   #
-  # TCP ports
+  # TCP dports
   #
-  firewall {"${ipt_allow_order} IN allow perfsonar PS specific TCP ports (1)(stateless) v6":
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific TCP dports (1)(stateless) v6":
       provider => 'ip6tables',
       proto    => 'tcp',
-      port     => $perfsonar::params::owamp_tcp_ports,
+      dport     => $perfsonar::owamp_tcp_ports,
       chain    => 'INPUT',
       action   => 'accept',
   }
-  firewall {"${ipt_allow_order} IN allow perfsonar PS specific TCP ports (2)(stateless) v6":
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific TCP dports (2)(stateless) v6":
       provider => 'ip6tables',
       proto    => 'tcp',
-      port     => $perfsonar::params::bwctl_tcp_ports,
+      dport     => concat($perfsonar::bwctl_tcp_ports , $perfsonar::bwctl_test_port , $perfsonar::bwctl_peer_port ),
       chain    => 'INPUT',
       action   => 'accept',
   }
-  
+
+  #need v6 addresses.
+  #perfsonar::firewall::allow_http { 'v6': source_array => $perfsonar::http_allow , ip_proto => 6, ipt_allow_order => $ipt_allow_order}
+
   #
-  # UDP ports
+  # UDP dports
   #
-  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP ports (1)(stateless) v6":
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP dports (1)(stateless) v6":
       provider => 'ip6tables',
       proto    => 'udp',
-      port     => $perfsonar::params::owamp_udp_ports,
+      dport     => $perfsonar::owamp_udp_ports,
       chain    => 'INPUT',
       action   => 'accept',
   }
-  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP ports (2)(stateless) v6":
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP dports (2)(stateless) v6":
       provider => 'ip6tables',
       proto    => 'udp',
-      port     => $perfsonar::params::bwctl_udp_ports,
+      dport     => $perfsonar::bwctl_test_port,
       chain    => 'INPUT',
       action   => 'accept',
   }
-  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP ports (3)(stateless) v6":
+  firewall {"${ipt_allow_order} IN allow perfsonar PS specific UDP dports (3)(stateless) v6":
       provider => 'ip6tables',
       proto    => 'udp',
-      port     => $perfsonar::params::traceroute_ports,
+      dport     => $perfsonar::traceroute_ports,
       chain    => 'INPUT',
       action   => 'accept',
   }
-  
+
 }

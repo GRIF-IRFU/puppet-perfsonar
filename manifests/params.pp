@@ -1,15 +1,22 @@
 #see : http://www.perfsonar.net/deploy/security-considerations/
 #
-# this params class will be the authoritative source both for daemons and firewall configuration 
+# this params class will be the authoritative source both for daemons and firewall configuration
 class perfsonar::params(
-  $icmp_types       = '255',
+  $icmp_types       = undef,
   $traceroute_ports = '33434-33634',
   $owamp_tcp_ports  = '861',
   $owamp_udp_ports  = '8760-9960',
-  $bwctl_tcp_ports  = [4823, 6001-6200, 5000-5900],
-  $bwctl_udp_ports  = [6001-6200, 5000-5900],
-  $http_ports       = [80,443],
-  
+
+  $bwctl_peer_port  = '6001-6200',
+  $bwctl_test_port  = '5001-5900',
+  $bwctl_nuttcp_port= '5301-5600',
+  $bwctl_iperf_port = '5001-5300',
+  $bwctl_owamp_port = '5601-5900',
+
+  $bwctl_tcp_ports  = ['4823', '3001-3003',  '7123', '8000-8020', '61617'],
+  #$bwctl_udp_ports  = ['6001-6200', '5000-5900'],
+  $http_ports       = ['80','443'],
+
   #this defines the order that will be used when defining firewall rules. Changing it might allow to reorder your iptable rules.
   #note : if you put leading 0s, this must be a string...
   $firewall_order    = '200',

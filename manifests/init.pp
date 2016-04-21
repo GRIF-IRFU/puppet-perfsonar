@@ -1,34 +1,30 @@
 #
 # Perfsonar PS base node.
-# 
+#
 # This is based on the netinstall kickstart :
 # e.g :
 # http://anonsvn.internet2.edu/svn/nptoolkit/trunk/kickstarts/centos6-netinstall.cfg
 # link seen here
-# http://code.google.com/p/esnet-perfsonar/wiki/CentOS6ToolkitBuilding 
-# 
+# http://code.google.com/p/esnet-perfsonar/wiki/CentOS6ToolkitBuilding
+#
 # or
 # http://mirror.chpc.utah.edu/pub/perfsonar-toolkit/3.3/centos6-netinstall.cfg
-# 
 #
+# NO more support for 3.4-
 class perfsonar(
-  #perfsonar release to use : 3.4 by default
-  $release='3.4',
-  
   #the perfsonar 3.3+ mesh url list
   $meshlist=[],
-  
+
   #web interface login. That user will be member of the psadmin group, and will not be allowed to login.
   $web_login='admin',
   $web_pass, #no default : mandatory argument. Corresponds to what returns openssl passwd -1 -salt <your salt> <your password>
-  
+
   #options
   $enable_repos=true,
   $enable_web100=false,
   $manage_ipv4_firewall=true,
   $manage_ipv6_firewall=true,
-  $enforce_admin_info = false,
-  
+
   #administrative information
   $admin_name,
   $site_name,
@@ -41,32 +37,42 @@ class perfsonar(
   $zipcode,
   $latitude,
   $longitude,
+
+  #firewall related params. Can be changed either in hiera or as class params
+  $icmp_types         = $perfsonar::params::icmp_types       ,
+  $traceroute_ports   = $perfsonar::params::traceroute_ports ,
+  $owamp_tcp_ports    = $perfsonar::params::owamp_tcp_ports  ,
+  $owamp_udp_ports    = $perfsonar::params::owamp_udp_ports  ,
+  $bwctl_peer_port    = $perfsonar::params::bwctl_peer_port  ,
+  $bwctl_test_port    = $perfsonar::params::bwctl_test_port  ,
+  $bwctl_nuttcp_port  = $perfsonar::params::bwctl_nuttcp_port,
+  $bwctl_iperf_port   = $perfsonar::params::bwctl_iperf_port ,
+  $bwctl_owamp_port   = $perfsonar::params::bwctl_owamp_port ,
+  $bwctl_tcp_ports    = $perfsonar::params::bwctl_tcp_ports  ,
+  $http_ports         = $perfsonar::params::http_ports       ,
+  $firewall_order     = $perfsonar::params::firewall_order   ,
+  $http_allow         = $perfsonar::params::http_allow       ,
+
+  #select what kind of perfsonar package to install.
+  # see : http://docs.perfsonar.net/install_options.html
+  $ps_bundle='perfsonar-toolkit'
 ) inherits perfsonar::params {
 
-  validate_bool($enable_repos, $enable_web100, $manage_ipv4_firewall, $manage_ipv6_firewall, $enforce_admin_info)
-
+  validate_bool($enable_repos, $enable_web100, $manage_ipv4_firewall, $manage_ipv6_firewall)
   validate_array($site_projects)
 
   if($enable_repos) { class { perfsonar::repos: enable_web100=>$enable_web100 } }
 
-  #
-  # iperf case :
-  #
-  case $release {
-    /^3.2/ : {
-      $iperf   = 'iperf'
-      $pkglist = [  web100_userland,owamp-client,owamp-server,bwctl-client,bwctl-server,ndt,npad,nuttcp,perl-perfSONAR_PS-LSRegistrationDaemon,perl-perfSONAR_PS-LSCacheDaemon,perl-perfSONAR_PS-LookupService,perl-perfSONAR_PS-SNMPMA,perl-perfSONAR_PS-PingER-server,perl-perfSONAR_PS-perfSONARBUOY-client,perl-perfSONAR_PS-perfSONARBUOY-server,perl-perfSONAR_PS-perfSONARBUOY-config,perl-perfSONAR_PS-TracerouteMA-config,perl-perfSONAR_PS-TracerouteMA-client,perl-perfSONAR_PS-TracerouteMA-server,perl-perfSONAR_PS-Toolkit,perl-perfSONAR_PS-Toolkit-SystemEnvironment,kmod-sk98lin]
-    }
-    /^3.3/ :{
-      $iperf   = [ iperf3,iperf3-devel ]
-      $pkglist = [ web100_userland,owamp-client,owamp-server,bwctl-client,bwctl-server,ndt,npad,nuttcp,perl-perfSONAR_PS-Toolkit,perl-perfSONAR_PS-Toolkit-SystemEnvironment,perl-perfSONAR_PS-LSCacheDaemon,perl-perfSONAR_PS-LSRegistrationDaemon,perl-perfSONAR_PS-MeshConfig-Agent,perl-perfSONAR_PS-PingER-server,perl-perfSONAR_PS-SimpleLS-BootStrap-client,perl-perfSONAR_PS-SNMPMA,perl-perfSONAR_PS-TracerouteMA-client,perl-perfSONAR_PS-TracerouteMA-config,perl-perfSONAR_PS-TracerouteMA-server,perl-perfSONAR_PS-perfSONARBUOY-client,perl-perfSONAR_PS-perfSONARBUOY-config,perl-perfSONAR_PS-perfSONARBUOY-server,kmod-sk98lin,tcptrace,xplot-tcptrace,tcpdump,]
-    }
-    #3.4+
-    default :{
-      $iperf   = [ iperf3,iperf3-devel ]
-      $pkglist = [ web100_userland,owamp-client,owamp-server,bwctl-client,bwctl-server,ndt,npad,nuttcp,perl-perfSONAR_PS-Toolkit,perl-perfSONAR_PS-Toolkit-SystemEnvironment,perl-perfSONAR_PS-LSCacheDaemon,perl-perfSONAR_PS-LSRegistrationDaemon,perl-perfSONAR_PS-MeshConfig-Agent,perl-perfSONAR_PS-PingER-server,perl-perfSONAR_PS-SimpleLS-BootStrap-client,perl-perfSONAR_PS-SNMPMA,perl-perfSONAR_PS-TracerouteMA-client,perl-perfSONAR_PS-TracerouteMA-config,perl-perfSONAR_PS-TracerouteMA-server,perl-perfSONAR_PS-perfSONARBUOY-client,perl-perfSONAR_PS-perfSONARBUOY-config,perl-perfSONAR_PS-perfSONARBUOY-server,tcptrace,xplot-tcptrace,tcpdump,perl-Try-Tiny]
-    }
+  #validate the target ps_package. See :
+  #http://docs.perfsonar.net/install_options.html
+  if($ps_bundle !~ /^perfsonar-(|tools|testpoint|core|toolkit|centralmanagement)$/) {
+    fail("This perfsonar bundle ($ps_bundle) is not yet supported")
   }
+
+  #packages list
+  $iperf   = [ 'iperf3','iperf3-devel' ]
+  $pkglist = [ 'web100_userland','owamp-client','owamp-server','bwctl-client','bwctl-server','ndt','npad','nuttcp',$ps_bundle,]
+
 
   #
   # install *latest* web100 kernel :
@@ -85,7 +91,7 @@ class perfsonar(
     file { "/root/$web100k":
       source =>"puppet:///modules/perfsonar/${web100k}",
       ensure => present,
-      mode   => 0755,
+      mode   => '0755',
     }
     ->
     exec { 'make-web100-kern-default':
@@ -95,21 +101,12 @@ class perfsonar(
     }
   }
 
-  #
-  # Install packages now.
-  #
-  #install *UN*specified dependencies :
-  package {
-    [ perl-Params-Validate,
-      perl-Class-Accessor,
-    ]: ensure => present
-  }
-  ->
+
   # install dependencies, as specified in the reference KS, then install perfsonar.
   #See, for each service :
   #http://psps.perfsonar.net/services.html
   package {
-    [libgomp,httpd,php,php-gd,php-xml,php-snmp,mysql,mysql-devel,perl-DBI,perl-DBD-MySQL]: ensure => present;
+    ['libgomp','httpd','php','php-gd','php-xml','php-snmp','mysql','mysql-devel','perl-DBI','perl-DBD-MySQL']: ensure => present;
     $iperf: ensure => latest
   }
   ->
@@ -130,12 +127,12 @@ class perfsonar(
 
 
   #ps-PS 3.3+case
-  file { "/opt/perfsonar_ps/mesh_config/etc/agent_configuration.conf" :
+  file { "/etc/perfsonar/meshconfig-agent.conf" :
     ensure  => present,
     mode    => '0644',
     content => template("perfsonar/mesh_conf.3.3.erb"),
     owner   => perfsonar,group=>perfsonar,
-    require => Package[perl-perfSONAR_PS-MeshConfig-Agent],
+    require => Package[$ps_bundle],
   }
 
   #
@@ -150,80 +147,91 @@ class perfsonar(
   }
   group { 'psadmin':
     ensure  => present,
-    require => Package[perl-perfSONAR_PS-Toolkit],
+    require => Package[$ps_bundle],
   }
   group { $web_login:
     ensure  => present,
   }
-  
+
   #
   # Some services
   #
-  service {
-    'ls_cache_daemon':
-      ensure     =>running,
-      hasstatus  =>false,
-      hasrestart =>true,
-      require    =>Package[perl-perfSONAR_PS-LSCacheDaemon];
-    'ls_registration_daemon':
-      ensure     =>running,
-      hasstatus  =>false,
-      hasrestart =>true,
-      require    =>Package[perl-perfSONAR_PS-LSRegistrationDaemon];
-    'cassandra':
-      ensure     =>running,
-      hasstatus  =>true,
-      hasrestart =>true,
-      require    =>Package[perl-perfSONAR_PS-Toolkit]; #cassandra required by esmond, itself required by this one
-    'config_daemon':
-      ensure     => running,
-      hasstatus  => false,
-      hasrestart => true,
-      require    => Package[perl-perfSONAR_PS-Toolkit];
+  $ps_services={
+    'perfsonar-lscachedaemon'         => {'pattern' => 'lscachedaemon.pl'},
+    'perfsonar-lsregistrationdaemon'  => {'pattern' => 'lsregistrationdaemon'},
+    'perfsonar-configdaemon'          => {'pattern' => 'config_daemon'},
+    'cassandra'                       => {'hasstatus' => true },
   }
-  -> Service[httpd]
+
+  create_resources('service' , $ps_services ,{hasstatus => false, hasrestart => true, require => Package[$ps_bundle], before => Service['httpd']})
+
 
   #administrative info setup
 
   #make sure the contry code matches an  ISO3166-like code
-  if $country =~  /^[A-Z]{2}$/ {
-    $countrycode=$country
-    }
-  else {
-    $countrycode=''
-    err("The given perfsonar coutry code is invalid/not ISO3166 compliant : ${country}")
+  if $country !~  /^[A-Z]{2}$/ {
+    fail("The given perfsonar coutry code is invalid/not ISO3166 compliant : ${country}")
   }
 
-  if $enforce_admin_info {
-    file { '/opt/perfsonar_ps/toolkit/etc/administrative_info':
-      ensure  => 'file',
-      content => template('perfsonar/administrative_info.erb'),
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      notify  => Exec['/opt/perfsonar_ps/toolkit/scripts/update_administrative_info.pl']
-    }
-  } else {
-    File_line {
-      path    => '/opt/perfsonar_ps/toolkit/etc/administrative_info',
-      require => Package['perl-perfSONAR_PS-Toolkit'],
-      notify  => Exec['/opt/perfsonar_ps/toolkit/scripts/update_administrative_info.pl']
-    }
+  #the httpd lens changes space separated values into arrays : not easy to manage with that... replace spaces.
+  $escaped_admin_name = regsubst($admin_name,' ','_','G' )
+  $escaped_city       = regsubst($city,' ','_','G' )
+  $escaped_site_name  = regsubst($site_name,' ','_','G' )
 
-    file_line { "admin_name": line => "full_name=${admin_name}", match => '^full_name' }
-    file_line { "site_name": line => "site_name=${site_name}", match => '^site_name' }
-    file_line { "site_location": line => "site_location=${site_location}", match => '^site_location' }
-    file_line { "administrator_email": line => "administrator_email=${administrator_email}", match => '^administrator_email' }
-    file_line { "city": line => "city=${city}", match => '^city' }
-    file_line { "state": line => "state=${state}", match => '^state' }
-    file_line { "country": line => "country=${country}", match => '^country' }
-    file_line { "zipcode": line => "zipcode=${zipcode}", match => '^zipcode' }
-    file_line { "latitude": line => "latitude=${latitude}", match => '^latitude' }
-    file_line { "longitude": line => "longitude=${longitude}", match => '^longitude' }
+  augeas { "lsregistration config":
+    lens    => 'Httpd.lns',
+    incl    => '/etc/perfsonar/lsregistrationdaemon.conf',
+    context => '/files/etc/perfsonar/lsregistrationdaemon.conf',
+    changes => [
+      "set directive[.='longitude'] 'longitude'",
+      "set directive[.='longitude']/arg '${longitude}'",
+      "set directive[.='latitude'] 'latitude'",
+      "set directive[.='latitude']/arg '${latitude}'",
+      "set directive[.='city'] 'city'",
+      "set directive[.='city']/arg '${escaped_city}'",
+      "set directive[.='site_name'] 'site_name'",
+      "set directive[.='site_name']/arg '${escaped_site_name}'",
+      "set directive[.='country'] 'country'",
+      "set directive[.='country']/arg '${country}'",
+      "set directive[.='zipcode'] 'zipcode'",
+      "set directive[.='zipcode']/arg '${zipcode}'",
+      #"touch administrator", #only for puppet4.
+      "set administrator/directive[.='name'] 'name'",
+      "set administrator/directive[.='name']/arg '${escaped_admin_name}'",
+      "set administrator/directive[.='email'] 'email'",
+      "set administrator/directive[.='email']/arg '$administrator_email'",
+    ],
+    require => Package[$ps_bundle], #otherwise, file can be created before RPM !
+  }
+  ~>
+  Service['perfsonar-lsregistrationdaemon']
+
+  #make sure bwctl ports are correct.
+  #Note : since selection of the running daemons is done using the web interface, we must resort to not managing the service and using exec.
+  exec {"refresh_bw":
+      path => ['/usr/bin','/usr/sbin','/bin','/sbin',],
+      logoutput => true,
+      command => "bash -c 'if pgrep bwctld >/dev/null ; then /sbin/service bwctld restart ; fi'", #make bwctl is restarted when config changes (condrestart)
+      user => root,
+      refreshonly => true,
+
   }
 
-  exec { '/opt/perfsonar_ps/toolkit/scripts/update_administrative_info.pl':
-    refreshonly => true,
-    require     => Service[config_daemon],
+  #new location in 3.5+
+  $bwctl_conf='/etc/bwctl-server/bwctl-server.conf'
+
+  file_line { "peer_port": line => "peer_port ${perfsonar::bwctl_peer_port}", match => '^peer_port ' , path=>$bwctl_conf, notify => Exec['refresh_bw'] , require => Package[$ps_bundle] }
+  file_line { "test_port": line => "test_port ${perfsonar::bwctl_test_port}", match => '^test_port ' , path=>$bwctl_conf, notify => Exec['refresh_bw'] , require => Package[$ps_bundle] }
+  file_line { "nuttcp_port": line => "nuttcp_port ${perfsonar::bwctl_nuttcp_port}", match => '^nuttcp_port ' , path=>$bwctl_conf, notify => Exec['refresh_bw'] , require => Package[$ps_bundle] }
+  file_line { "iperf_port": line => "iperf_port ${perfsonar::bwctl_iperf_port}", match => '^iperf_port ' , path=>$bwctl_conf, notify => Exec['refresh_bw'] , require => Package[$ps_bundle] }
+  file_line { "owamp_port": line => "owamp_port ${perfsonar::bwctl_owamp_port}", match => '^owamp_port ' , path=>$bwctl_conf, notify => Exec['refresh_bw'] , require => Package[$ps_bundle] }
+
+  #disable perfsonar sudo/root tempering
+  #file_line { "perfsonar_adminuser": path => '/root/.bashrc', line => '#deleted psadmin_user directive', match => '.*psadmin_user --auto.*' , ensure=> present }
+  #file_line { "perfsonar_sudouser": path => '/root/.bashrc', line => '#deleted pssudo_user directive', match => '.*pssudo_user --auto.*' , ensure=> present }
+  exec { 'cleanup_sudo_psadmin':
+    path    => ['/usr/bin','/usr/sbin','/bin','/sbin',],
+    command => 'sed -i -re \'/^[^#]/s/(.*(psadmin|pssudo)_user.*)/#\1/\' /root/.bashrc',
+    onlyif  => 'egrep -q "^[^#].*(psadmin|pssudo)_user.*" /root/.bashrc'
   }
 }
